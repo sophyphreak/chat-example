@@ -1,18 +1,14 @@
-const app = require('express')();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-const port = process.env.PORT || 3000;
+import { Server } from "socket.io";
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+const io = new Server(5000, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+  },
 });
 
-io.on('connection', (socket) => {
-  socket.on('chat message', msg => {
-    io.emit('chat message', msg);
+io.on("connection", (socket) => {
+  socket.on("chat message client speaking", (message) => {
+    io.emit("chat message", { message, timeString: new Date().toString() });
   });
-});
-
-http.listen(port, () => {
-  console.log(`Socket.IO server running at http://localhost:${port}/`);
 });
